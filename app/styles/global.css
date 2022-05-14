@@ -35,7 +35,7 @@ html,
 body {
   padding: 0;
   margin: 0;
-  background-color: var(--color-background);
+  background-color: transparent;
   color: var(--color-foreground);
 }
 
@@ -213,4 +213,9 @@ input:where([type="search"]) {
 .remix__form > * {
   margin-top: 0;
   margin-bottom: 0;
+}
+
+.clock .clock__thetime {
+  /* color: white; */
+  font-size: 32px;
 }
