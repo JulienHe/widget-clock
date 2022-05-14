@@ -1,21 +1,19 @@
 import type { MetaFunction, LoaderFunction } from "remix";
-import { useParams } from "@remix-run/react";
+import { useLoaderData, useParams } from "@remix-run/react";
 import { json } from "remix";
 import { formatInTimeZone } from "date-fns-tz";
 import { useEffect, useState } from "react";
 const { countryCodeEmoji } = require("country-code-emoji");
 
 type IndexData = {
-  resources: Array<{ name: string; url: string }>;
-  demos: Array<{ name: string; to: string }>;
+  timezone: string;
 };
 
-// Loaders provide data to components and are only ever called on the server, so
-// you can connect to a database or run any server side code you want right next
-// to the component that renders it.
-// https://remix.run/api/conventions#loader
-export let loader: LoaderFunction = () => {
-  return json("hello");
+export let loader: LoaderFunction = async ({ request }) => {
+  const url = new URL(request.url);
+  const tz = url.searchParams.get("tz") || "";
+  let data: IndexData = { timezone: tz };
+  return json(data);
 };
 
 // https://remix.run/api/conventions#meta
@@ -28,14 +26,15 @@ export let meta: MetaFunction = () => {
 
 // https://remix.run/guides/routing#index-routes
 export default function Index() {
-  // let data = useLoaderData<IndexData>();
+  let data = useLoaderData<IndexData>();
+
   const [uiTime, setUiTime] = useState("");
   const params = useParams();
 
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
-      const zonedDate = formatInTimeZone(now, "Asia/Seoul", "HH:mm:ss");
+      const zonedDate = formatInTimeZone(now, data.timezone, "HH:mm:ss");
       setUiTime(zonedDate);
     }, 1000);
     return () => clearInterval(interval);
